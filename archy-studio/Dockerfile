@@ -10,10 +10,12 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Download and install the Genesys Cloud Archy CLI for Linux
-RUN curl -sSL -o archy.zip "https://sdk-cdn.mypurecloud.com/archy/latest/archy-linux.zip" \
-    && unzip archy.zip \
-    && chmod +x archy \
-    && mv archy /usr/local/bin/archy \
+RUN mkdir -p /opt/archy \
+    && curl -sSL -o archy.zip "https://sdk-cdn.mypurecloud.com/archy/latest/archy-linux.zip" \
+    && unzip archy.zip -d /opt/archy \
+    && chmod +x /opt/archy/archy \
+    && chmod -R +x /opt/archy/archyBin \
+    && ln -s /opt/archy/archy /usr/local/bin/archy \
     && rm archy.zip
 
 # Copy package files and install dependencies

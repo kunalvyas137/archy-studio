@@ -251,6 +251,12 @@ app.post('/api/git/init', async (req, res) => {
 });
 
 // ──────────────────────────────────────────────
+// HEALTH CHECK (For AWS ECS/ALB)
+// ──────────────────────────────────────────────
+app.get('/health', (req, res) => res.status(200).send('OK'));
+app.get('/api/health', (req, res) => res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() }));
+
+// ──────────────────────────────────────────────
 // STATIC FILES (Electron production mode)
 // Serve the built Vite dist/ so Electron doesn't need a separate dev server
 // ──────────────────────────────────────────────
