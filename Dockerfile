@@ -19,11 +19,11 @@ RUN mkdir -p /opt/archy \
     && rm archy.zip
 
 # Copy package files and install dependencies
-COPY package*.json ./
+COPY archy-studio/package*.json ./
 RUN npm install
 
 # Copy application source code
-COPY . .
+COPY archy-studio/ .
 
 # Build the Vite frontend application
 RUN npm run build
