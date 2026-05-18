@@ -1,0 +1,13 @@
+inboundCall:
+  name: "{{flowName}}"
+  division: "{{division}}"
+  defaultLanguage: en-us
+  startUpRef: "/inboundCall/menus/menu[Welcome_Menu]"
+  initialGreeting:
+    tts: "Welcome to {{orgName}}."
+  menus:
+    - menu:
+        name: Welcome_Menu
+        actions:
+          - transferToAcd:
+              queueName: "{{queueName}}"

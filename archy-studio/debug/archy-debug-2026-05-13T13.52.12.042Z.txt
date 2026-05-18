@@ -1,0 +1,16 @@
+2026-05-13T13:52:12.547Z: [DEBUG] - Parameter 'loggingCallback' in ''ArchLogging'.setLoggingCallback' Logging callback hook successfully set.
+2026-05-13T13:52:12.553Z: [ERROR] setting the Archy exit code to 107
+2026-05-13T13:52:12.554Z: [ERROR] An error occurred.
+2026-05-13T13:52:12.554Z: [INFO] 
+2026-05-13T13:52:12.555Z: [ERROR] the parameter '--outputFile' is not valid for use with the 'export' command. You can see more information about the 'export' command by running 'archy export --help'.
+2026-05-13T13:52:12.555Z: [INFO] 
+2026-05-13T13:52:12.555Z: [ERROR] Error(s) encountered.
+2026-05-13T13:52:12.555Z: [INFO] 
+2026-05-13T13:52:12.555Z: [INFO] using '/Users/mac/Projects/Callflow Visualizer/archy-studio' as the home directory since none was defined.
+2026-05-13T13:52:12.555Z: [INFO] Log:  /Users/mac/Projects/Callflow Visualizer/archy-studio/debug/archy-debug-2026-05-13T13.52.12.042Z.txt
+2026-05-13T13:52:13.209Z: [INFO] execution complete.
+2026-05-13T13:52:13.209Z: [ERROR] 
+2026-05-13T13:52:13.209Z: [ERROR] exit code: 107
+2026-05-13T13:52:13.210Z: [INFO] 
+2026-05-13T13:52:13.211Z: [DEBUG] ensureDirectoryExists - the directory '/Users/mac/Projects/Callflow Visualizer/archy-studio/debug' exists.
+2026-05-13T13:52:13.211Z: [DEBUG] Writing log contents to '/Users/mac/Projects/Callflow Visualizer/archy-studio/debug/archy-debug-2026-05-13T13.52.12.042Z.txt'.

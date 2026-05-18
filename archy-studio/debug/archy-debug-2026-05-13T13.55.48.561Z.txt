@@ -1,0 +1,16 @@
+2026-05-13T13:55:49.070Z: [DEBUG] - Parameter 'loggingCallback' in ''ArchLogging'.setLoggingCallback' Logging callback hook successfully set.
+2026-05-13T13:55:49.076Z: [ERROR] setting the Archy exit code to 107
+2026-05-13T13:55:49.077Z: [ERROR] An error occurred.
+2026-05-13T13:55:49.077Z: [INFO] 
+2026-05-13T13:55:49.077Z: [ERROR] the parameter '--file' is not valid for use with the 'validate' command. You can see more information about the 'validate' command by running 'archy validate --help'.
+2026-05-13T13:55:49.078Z: [INFO] 
+2026-05-13T13:55:49.078Z: [ERROR] Error(s) encountered.
+2026-05-13T13:55:49.078Z: [INFO] 
+2026-05-13T13:55:49.079Z: [INFO] using '/Users/mac/Projects/Callflow Visualizer/archy-studio' as the home directory since none was defined.
+2026-05-13T13:55:49.079Z: [INFO] Log:  /Users/mac/Projects/Callflow Visualizer/archy-studio/debug/archy-debug-2026-05-13T13.55.48.561Z.txt
+2026-05-13T13:55:49.407Z: [INFO] execution complete.
+2026-05-13T13:55:49.407Z: [ERROR] 
+2026-05-13T13:55:49.408Z: [ERROR] exit code: 107
+2026-05-13T13:55:49.409Z: [INFO] 
+2026-05-13T13:55:49.412Z: [DEBUG] ensureDirectoryExists - the directory '/Users/mac/Projects/Callflow Visualizer/archy-studio/debug' exists.
+2026-05-13T13:55:49.412Z: [DEBUG] Writing log contents to '/Users/mac/Projects/Callflow Visualizer/archy-studio/debug/archy-debug-2026-05-13T13.55.48.561Z.txt'.

@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply antialiased text-slate-800 bg-slate-50;
+    font-family: 'Outfit', sans-serif;
+  }
+}
+
+/* React Flow custom node transitions */
+.react-flow__node {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease;
+}
+
+/* Custom Glass Edge Styling */
+.react-flow__edge-path {
+  stroke-linecap: round;
+}
+
+/* Ambient Background Glows - Subtler for light theme */
+.ambient-glow-1 {
+  position: absolute;
+  width: 60vw;
+  height: 60vw;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.03) 0%, rgba(248, 250, 252, 0) 70%);
+  top: -20%;
+  left: -10%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ambient-glow-2 {
+  position: absolute;
+  width: 50vw;
+  height: 50vw;
+  background: radial-gradient(circle, rgba(236, 72, 153, 0.03) 0%, rgba(248, 250, 252, 0) 70%);
+  bottom: -10%;
+  right: -10%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Custom Scrollbar for Light Theme */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(241, 245, 249, 0.5);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(203, 213, 225, 0.8);
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 1);
+}

@@ -1,0 +1,280 @@
+commonModule:
+  name: Staging - RCG Main Flow DT Lookup
+  description: ""
+  division: Home
+  supportedLanguages:
+    de-de:
+      none: true
+    en-au:
+      none: true
+    en-gb:
+      none: true
+    en-us:
+      none: true
+    es-es:
+      none: true
+    es-us:
+      none: true
+    fr-fr:
+      none: true
+    it-it:
+      none: true
+  variables:
+    - stringVariable:
+        name: Common.ClosedMsg
+        initialValue:
+          noValue: true
+        isInput: false
+        isOutput: true
+    - stringVariable:
+        name: Common.dtRoute
+        initialValue:
+          noValue: true
+        isInput: false
+        isOutput: true
+    - stringVariable:
+        name: Common.ScheduleGroup
+        initialValue:
+          noValue: true
+        isInput: false
+        isOutput: true
+    - stringVariable:
+        name: Common.StripDNIS
+        initialValue:
+          noValue: true
+        isInput: true
+        isOutput: false
+    - stringVariable:
+        name: Common.TargetQueue
+        initialValue:
+          noValue: true
+        isInput: false
+        isOutput: true
+    - stringVariable:
+        name: Common.WelcomeMsg
+        initialValue:
+          noValue: true
+        isInput: false
+        isOutput: true
+  settingsCommonModule:
+    compatibleFlowTypes:
+      - flowType: inboundcall
+      - flowType: inqueuecall
+  settingsActionDefaults:
+    playAudioOnSilence:
+      timeout:
+        lit:
+          seconds: 40
+    detectSilence:
+      timeout:
+        lit:
+          seconds: 40
+    callData:
+      processingPrompt:
+        noValue: true
+    callDataSecure:
+      processingPrompt:
+        noValue: true
+    collectInput:
+      noEntryTimeout:
+        lit:
+          seconds: 5
+    dialByExtension:
+      interDigitTimeout:
+        lit:
+          seconds: 6
+    transferToUser:
+      connectTimeout:
+        noValue: true
+    transferToNumber:
+      connectTimeout:
+        noValue: true
+    transferToGroup:
+      connectTimeout:
+        noValue: true
+    transferToFlowSecure:
+      connectTimeout:
+        lit:
+          seconds: 15
+  settingsPrompts:
+    ensureAudioInPrompts: false
+    promptMediaToValidate:
+      - mediaType: audio
+      - mediaType: tts
+  startUpTaskActions:
+    - dataTableLookup:
+        name: "DT Lookup: RCG Main Flow DT Lookup"
+        lookupValue:
+          exp: Common.StripDNIS
+        dataTable:
+          Stg - RCG Main Flow Data Table:
+            foundOutputs:
+              Description:
+                var: Task.Description
+              Environment:
+                var: Task.Environment
+              Route:
+                var: Common.dtRoute
+              Schedule:
+                var: Common.ScheduleGroup
+              Queue:
+                var: Common.TargetQueue
+              Language:
+                var: Task.Language
+              WelcomeMsg:
+                var: Common.WelcomeMsg
+              ClosedMsg:
+                var: Common.ClosedMsg
+            failureOutputs:
+              errorType:
+                noValue: true
+              errorMessage:
+                noValue: true
+        outputs:
+          found:
+            actions:
+              - setParticipantData:
+                  name: Set Participant Data
+                  attributes:
+                    - attribute:
+                        name:
+                          lit: "DT: RCG Main Flow Data Table"
+                        value:
+                          exp: "JsonParse(Append(\"{ \n\\\"Results\\\": \\\"\", \"Success\", \"\\\", \n\\\"Input\\\": \\\"\", ToString(Common.StripDNIS), \"\\\",\n\\\"Description\\\": \\\"\", ToString(Task.Description), \"\\\", \n\\\"Environment\\\": \\\"\", ToString(Task.Environment), \"\\\",\n\\\"Route\\\": \\\"\", ToString(Common.dtRoute), \"\\\", \n\\\"Schedule\\\": \\\"\", ToString(Common.ScheduleGroup), \"\\\", \n\\\"TargetQueue\\\": \\\"\", Common.TargetQueue, \"\\\",\n\\\"Language\\\": \\\"\", ToString(Task.Language), \"\\\", \n\\\"WelcomeMsg\\\": \\\"\", ToString(Common.WelcomeMsg), \"\\\", \n\\\"ClosedMsg\\\": \\\"\", ToString(Common.ClosedMsg), \"\\\"\n}\"))"
+          notFound:
+            actions:
+              - setParticipantData:
+                  name: Set Participant Data
+                  attributes:
+                    - attribute:
+                        name:
+                          lit: "DT: RCG Main Flow Data Table"
+                        value:
+                          exp: "JsonParse(Append(\"{ \n\\\"Results\\\": \\\"\", \"Not Found\", \"\\\", \n\\\"Input\\\": \\\"\", ToString(Common.StripDNIS), \"\\\"\n}\"))"
+          failure:
+            actions:
+              - setParticipantData:
+                  name: Set Participant Data
+                  attributes:
+                    - attribute:
+                        name:
+                          lit: "DT: RCG Main Flow Data Table"
+                        value:
+                          exp: "JsonParse(Append(\"{ \n\\\"Results\\\": \\\"\", \"Failure\", \"\\\", \n\\\"Input\\\": \\\"\", ToString(Common.StripDNIS), \"\\\"\n}\"))"
+    - setParticipantData:
+        name: Set Participant Data
+        attributes:
+          - attribute:
+              name:
+                lit: Method
+              value:
+                exp: Common.dtRoute
+          - attribute:
+              name:
+                lit: TargetQueue
+              value:
+                exp: Common.TargetQueue
+          - attribute:
+              name:
+                lit: Language
+              value:
+                exp: Task.Language
+    - switch:
+        name: Set Flow Language
+        evaluate:
+          firstTrue:
+            default:
+              actions:
+                - setLanguage:
+                    name: "Set Language: en-us"
+                    languageValue:
+                      lit: en-us
+                    language: en-us
+            cases:
+              - case:
+                  value:
+                    exp: Contains(Task.Language, "enAU", true)
+                  actions:
+                    - setLanguage:
+                        name: "Set Language: en-au"
+                        languageValue:
+                          lit: en-au
+                        language: en-au
+              - case:
+                  value:
+                    exp: Contains(Task.Language, "enUK", true)
+                  actions:
+                    - setLanguage:
+                        name: "Set Language: en-gb"
+                        languageValue:
+                          lit: en-gb
+                        language: en-gb
+              - case:
+                  value:
+                    exp: Contains(Task.Language, "enUS", true)
+                  actions:
+                    - setLanguage:
+                        name: "Set Language: en-us"
+                        languageValue:
+                          lit: en-us
+                        language: en-us
+              - case:
+                  value:
+                    exp: Contains(Task.Language, "frFR", true)
+                  actions:
+                    - setLanguage:
+                        name: "Set Language: fr-fr"
+                        languageValue:
+                          lit: fr-fr
+                        language: fr-fr
+              - case:
+                  value:
+                    exp: Contains(Task.Language, "deDE", true)
+                  actions:
+                    - setLanguage:
+                        name: "Set Language: de-de"
+                        languageValue:
+                          lit: de-de
+                        language: de-de
+              - case:
+                  value:
+                    exp: Contains(Task.Language, "itIT", true)
+                  actions:
+                    - setLanguage:
+                        name: "Set Language: it-it"
+                        languageValue:
+                          lit: it-it
+                        language: it-it
+              - case:
+                  value:
+                    exp: Contains(Task.Language, "esES", true)
+                  actions:
+                    - setLanguage:
+                        name: "Set Language: es-es"
+                        languageValue:
+                          lit: es-es
+                        language: es-es
+              - case:
+                  value:
+                    exp: Contains(Task.Language, "esUS", true)
+                  actions:
+                    - setLanguage:
+                        name: "Set Language: es-us"
+                        languageValue:
+                          lit: es-us
+                        language: es-us
+    - endTask:
+        name: Exit Common Module
+  startUpTaskVariables:
+    - stringVariable:
+        name: Task.Description
+        initialValue:
+          noValue: true
+    - stringVariable:
+        name: Task.Environment
+        initialValue:
+          noValue: true
+    - stringVariable:
+        name: Task.Language
+        initialValue:
+          noValue: true
