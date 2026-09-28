@@ -1,0 +1,7 @@
+{
+  "filter": {
+    "type": "or",
+    "predicates": [{ "type": "dimension", "dimension": "queueId", "operator": "matches", "value": "{{queueId}}" }]
+  },
+  "metrics": ["oWaiting", "oInteracting", "oAlerting", "oOnQueueUsers", "oOffQueueUsers", "oMemberUsers", "oActiveUsers", "oLongestWaiting"]
+}

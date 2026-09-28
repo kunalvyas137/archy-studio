@@ -1,0 +1,9 @@
+{
+  "interval": "{{interval}}",
+  "order": "asc",
+  "orderBy": "conversationStart",
+  "paging": { "pageSize": 100, "pageNumber": 1 },
+  "segmentFilters": [
+    { "type": "or", "predicates": [{ "dimension": "queueId", "value": "{{queueId}}" }] }
+  ]
+}
