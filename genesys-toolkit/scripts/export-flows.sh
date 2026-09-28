@@ -16,8 +16,15 @@ done
 orgflag=(); [[ -n "$org" ]] && orgflag=(--org "$org")
 params=(--param deleted=false); [[ -n "$type" ]] && params+=(--param "type=$type")
 mkdir -p "$out"
+out="$(cd "$out" && pwd)"
 "$ROOT/scripts/gcx" call GET /api/v2/flows --paginate "${params[@]}" "${orgflag[@]}" --out "$out/flows.json"
-jq -r --arg re "$name" '.[] | select(.name | test($re; "i")) | [.id, .type, .name] | @tsv' "$out/flows.json" |
+python3 - "$out/flows.json" "$name" <<'PY' |
+import json, re, sys
+rx = re.compile(sys.argv[2], re.I)
+for f in json.load(open(sys.argv[1])):
+    if rx.search(f.get("name", "")):
+        print("\t".join([f["id"], f.get("type", ""), f["name"]]))
+PY
 while IFS=$'\t' read -r id ftype fname; do
   echo "==> $ftype  $fname"
   "$ROOT/scripts/archy-gc" "${orgflag[@]}" export --flowId "$id" --exportType yaml --outputDir "$out/yaml" --force ||

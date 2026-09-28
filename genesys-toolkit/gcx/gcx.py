@@ -282,9 +282,9 @@ def validate_body(op, body, loose=False):
     if not bs:
         return ["Operation has no request body."]
     defs = copy.deepcopy(spec()["definitions"])
-    if not loose:
-        strict(defs)
     schema = {"definitions": defs, **copy.deepcopy(bs)}
+    if not loose:
+        strict(schema)
     v = jsonschema.Draft4Validator(schema)
     return [f"{'/'.join(map(str, e.absolute_path)) or '<root>'}: {e.message[:300]}" for e in sorted(v.iter_errors(body), key=lambda e: list(map(str, e.absolute_path)))]
 
@@ -382,7 +382,12 @@ class Client:
         return tok["access_token"]
 
     def request(self, method, path, **kw):
-        url = path if path.startswith("http") else self.base + path
+        if "://" in path:
+            if not path.startswith(self.base + "/"):
+                sys.exit(f"Refusing to send the Genesys token to {path}; only {self.base} is allowed")
+            url = path
+        else:
+            url = self.base + path
         for attempt in range(8):
             r = self.s.request(method, url, timeout=120, **kw)
             if r.status_code == 429 or r.status_code >= 500 and attempt < 3:
@@ -421,6 +426,38 @@ def emit(data, out):
         print(text)
 
 
+def emit_stream(rows, out):
+    """Write an iterable of records as a JSON array without holding them all in memory.
+    If a request fails midway, the file is left as an unterminated array ending in the last complete record."""
+    if not out:
+        write_array(rows, sys.stdout)
+        return
+    Path(out).parent.mkdir(parents=True, exist_ok=True)
+    with open(out, "w") as f:
+        n = write_array(rows, f)
+    print(f"Wrote {out} ({n} records)", file=sys.stderr)
+
+
+def write_array(rows, f):
+    n = 0
+    f.write("[")
+    for row in rows:
+        f.write(",\n" if n else "\n")
+        f.write(json.dumps(row))
+        n += 1
+    f.write("\n]\n")
+    return n
+
+
+READ_ONLY_POST = re.compile(r"/(query|jobs)$")
+
+
+def check_read_only(method, path, allow_write):
+    if method == "GET" or allow_write or (method == "POST" and READ_ONLY_POST.search(path.split("?")[0])):
+        return
+    sys.exit(f"{method} {path} can modify the org; gcx is read-only by default. Re-run with --allow-write if intended.")
+
+
 def cmd_whoami(args):
     c = Client(args.org)
     org = c.request("GET", "/api/v2/organizations/me")
@@ -428,13 +465,15 @@ def cmd_whoami(args):
 
 
 def cmd_call(args):
+    method = args.method.upper()
+    check_read_only(method, args.path, args.allow_write)
     c = Client(args.org)
     params = dict(kv.split("=", 1) for kv in args.param or [])
     if args.paginate:
-        emit(list(c.paginate(args.path, params)), args.out)
+        emit_stream(c.paginate(args.path, params), args.out)
         return
     body = render_body(args.body, args) if args.body else None
-    emit(c.request(args.method.upper(), args.path, params=params, json=body), args.out)
+    emit(c.request(method, args.path, params=params, json=body), args.out)
 
 
 def cmd_query(args):
@@ -444,20 +483,23 @@ def cmd_query(args):
     errs = validate_body(op, body, args.loose)
     if errs:
         sys.exit("Body fails spec validation:\n  " + "\n  ".join(errs))
+    check_read_only(method, path, False)
     c = Client(args.org)
     if path.endswith("/details/query"):
         body.setdefault("paging", {"pageSize": 100, "pageNumber": 1})
         key = "conversations" if "conversations" in path else "userDetails"
-        rows = []
-        while True:
-            res = c.request(method, path, json=body)
-            batch = res.get(key, [])
-            rows.extend(batch)
-            print(f"[gcx] page {body['paging']['pageNumber']}: {len(batch)} (total {res.get('totalHits')})", file=sys.stderr)
-            if len(batch) < body["paging"]["pageSize"]:
-                break
-            body["paging"]["pageNumber"] += 1
-        emit(rows, args.out)
+
+        def pages():
+            while True:
+                res = c.request(method, path, json=body)
+                batch = res.get(key, [])
+                yield from batch
+                print(f"[gcx] page {body['paging']['pageNumber']}: {len(batch)} (total {res.get('totalHits')})", file=sys.stderr)
+                if len(batch) < body["paging"]["pageSize"]:
+                    break
+                body["paging"]["pageNumber"] += 1
+
+        emit_stream(pages(), args.out)
     else:
         emit(c.request(method, path, json=body), args.out)
 
@@ -482,15 +524,18 @@ def cmd_job(args):
         if st.get("state") in ("FAILED", "CANCELLED", "EXPIRED"):
             sys.exit(f"Job {jid} {st.get('state')}: {st.get('errorMessage')}")
         time.sleep(args.poll)
-    rows, cursor = [], None
     key = {"conversations/details": "conversations", "users/details": "userDetails"}.get(args.kind, "results")
-    while True:
-        res = c.request("GET", f"{base}/{jid}/results", params={"pageSize": 1000, **({"cursor": cursor} if cursor else {})})
-        rows.extend(res.get(key, []))
-        cursor = res.get("cursor")
-        if not cursor:
-            break
-    emit(rows, args.out)
+
+    def pages():
+        cursor = None
+        while True:
+            res = c.request("GET", f"{base}/{jid}/results", params={"pageSize": 1000, **({"cursor": cursor} if cursor else {})})
+            yield from res.get(key, [])
+            cursor = res.get("cursor")
+            if not cursor:
+                break
+
+    emit_stream(pages(), args.out)
 
 
 # ---------------------------------------------------------------- cli
@@ -546,6 +591,7 @@ def main():
     p.add_argument("--param", action="append", help="query param k=v")
     p.add_argument("--body")
     p.add_argument("--paginate", action="store_true", help="GET all pages of entities")
+    p.add_argument("--allow-write", action="store_true", help="permit PUT/PATCH/DELETE and non-query POSTs")
     tmpl(p)
     online(p)
     p.set_defaults(fn=cmd_call)

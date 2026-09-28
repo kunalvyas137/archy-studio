@@ -56,7 +56,7 @@ gcx validate postAnalyticsConversationsAggregatesQuery queries/conversation_aggr
 gcx query postAnalyticsConversationsAggregatesQuery queries/conversation_aggregates_queue_kpis.json --last 7d --out out/kpis.json
 gcx query postAnalyticsConversationsDetailsQuery queries/conversation_details_voice_inbound.json --last 24h --out out/details.json
 gcx job conversations/details queries/conversation_details_job_all_media.json --interval 2026-08-01T00:00:00Z/2026-09-01T00:00:00Z --out out/aug.json
-gcx call GET /api/v2/routing/queues --paginate --out out/queues.json
+gcx call GET /api/v2/routing/queues --paginate --out out/queues.json   # PUT/PATCH/DELETE and non-query POSTs need --allow-write
 
 gc routing queues list --autopaginate | jq -r '.[] | [.id,.name] | @tsv'
 export-flows.sh --type inboundcall --name 'LSG_NACC'    # flow list + Archy YAML per flow

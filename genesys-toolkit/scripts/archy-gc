@@ -7,5 +7,4 @@ prefix="GENESYSCLOUD_"
 if [[ "${1:-}" == "--org" ]]; then prefix="GENESYSCLOUD_${2^^}_"; shift 2; fi
 region_var="${prefix}REGION"; id_var="${prefix}OAUTHCLIENT_ID"; secret_var="${prefix}OAUTHCLIENT_SECRET"
 location="$(python3 -c "import sys; sys.path.insert(0, '$ROOT/gcx'); from gcx import REGIONS; r=sys.argv[1]; print(REGIONS.get(r, r))" "${!region_var:?set $region_var}")"
-cd "$ROOT/archy"
-exec ./archy "$@" --clientId "${!id_var:?set $id_var}" --clientSecret "${!secret_var:?set $secret_var}" --location "$location"
+exec "$ROOT/archy/archy" "$@" --clientId "${!id_var:?set $id_var}" --clientSecret "${!secret_var:?set $secret_var}" --location "$location"
