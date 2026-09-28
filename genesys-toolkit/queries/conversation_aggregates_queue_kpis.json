@@ -1,0 +1,11 @@
+{
+  "interval": "{{interval}}",
+  "granularity": "P1D",
+  "timeZone": "UTC",
+  "groupBy": ["queueId", "mediaType"],
+  "metrics": ["nOffered", "tAnswered", "tAbandon", "tShortAbandon", "oServiceLevel", "tWait", "tHandle", "tTalk", "tHeld", "tAcw", "nTransferred", "nOverSla"],
+  "filter": {
+    "type": "and",
+    "predicates": [{ "type": "dimension", "dimension": "mediaType", "operator": "matches", "value": "voice" }]
+  }
+}

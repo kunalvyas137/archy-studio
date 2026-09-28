@@ -1,0 +1,13 @@
+{
+  "interval": "{{interval}}",
+  "granularity": "P1D",
+  "groupBy": ["dnis", "flowOutType"],
+  "metrics": ["nConversations", "tIvr", "tFlowOut", "nOffered"],
+  "filter": {
+    "type": "and",
+    "predicates": [
+      { "type": "dimension", "dimension": "mediaType", "operator": "matches", "value": "voice" },
+      { "type": "dimension", "dimension": "direction", "operator": "matches", "value": "inbound" }
+    ]
+  }
+}

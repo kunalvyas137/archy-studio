@@ -1,0 +1,6 @@
+{
+  "interval": "{{interval}}",
+  "granularity": "P1D",
+  "groupBy": ["flowId", "flowOutcomeId", "flowOutcomeValue"],
+  "metrics": ["nFlow", "nFlowOutcome", "nFlowOutcomeFailed", "tFlowOutcome", "tFlowDisconnect", "tFlowExit"]
+}

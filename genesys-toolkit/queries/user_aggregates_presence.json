@@ -1,0 +1,6 @@
+{
+  "interval": "{{interval}}",
+  "granularity": "P1D",
+  "groupBy": ["userId"],
+  "metrics": ["tSystemPresence", "tOrganizationPresence", "tAgentRoutingStatus"]
+}

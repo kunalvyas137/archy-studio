@@ -1,0 +1,10 @@
+{
+  "interval": "{{interval}}",
+  "granularity": "P1D",
+  "groupBy": ["queueId"],
+  "metrics": ["nOffered", "nCallbackScheduled", "nCallbackAttempts", "nCallbackOverSla", "oCallbackServiceLevel", "tCallbackConnect", "tCallbackAbandon", "tCallbackNotReached", "tActiveCallback", "tHandle"],
+  "filter": {
+    "type": "and",
+    "predicates": [{ "type": "dimension", "dimension": "mediaType", "operator": "matches", "value": "callback" }]
+  }
+}

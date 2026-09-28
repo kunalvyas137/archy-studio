@@ -1,0 +1,5 @@
+{
+  "interval": "{{interval}}",
+  "order": "asc",
+  "orderBy": "conversationStart"
+}
